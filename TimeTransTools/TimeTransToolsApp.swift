@@ -11,7 +11,7 @@ import SwiftUI
 struct TimeTransToolsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainMenuView()
         }
     }
 }
