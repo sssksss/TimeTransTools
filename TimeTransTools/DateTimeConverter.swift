@@ -83,4 +83,69 @@ struct DateTimeConverter {
         formatter.dateFormat = format
         return formatter.string(from: date)
     }
+}
+
+// 扩展DateTimeConverter添加天计数和毫秒计数转换功能
+extension DateTimeConverter {
+    // 日期转换为天计数（从参考日期开始的天数）
+    static func dateStringToDayCount(_ dateString: String, referenceDate: Date? = nil) -> Int? {
+        guard let date = dateFormatter().date(from: dateString) else {
+            return nil
+        }
+        
+        let referenceDate = referenceDate ?? Date(timeIntervalSince1970: 0)
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day], from: referenceDate, to: date)
+        return components.day
+    }
+    
+    // 天计数转换为日期
+    static func dayCountToDateString(_ dayCount: Int, referenceDate: Date? = nil) -> String {
+        let referenceDate = referenceDate ?? Date(timeIntervalSince1970: 0)
+        let calendar = Calendar.current
+        guard let date = calendar.date(byAdding: .day, value: dayCount, to: referenceDate) else {
+            return "无效天数"
+        }
+        
+        return dateFormatter().string(from: date)
+    }
+    
+    // 日期转换为毫秒计数
+    static func dateStringToMilliseconds(_ dateString: String, referenceDate: Date? = nil) -> Int64? {
+        guard let date = dateFormatter().date(from: dateString) else {
+            return nil
+        }
+        
+        if let referenceDate = referenceDate {
+            let timeInterval = date.timeIntervalSince(referenceDate)
+            return Int64(timeInterval * 1000)
+        } else {
+            return Int64(date.timeIntervalSince1970 * 1000)
+        }
+    }
+    
+    // 毫秒计数转换为日期
+    static func millisecondsToDateString(_ milliseconds: Int64, referenceDate: Date? = nil) -> String {
+        let seconds = Double(milliseconds) / 1000.0
+        
+        if let referenceDate = referenceDate {
+            let date = referenceDate.addingTimeInterval(seconds)
+            return dateFormatter().string(from: date)
+        } else {
+            let date = Date(timeIntervalSince1970: seconds)
+            return dateFormatter().string(from: date)
+        }
+    }
+    
+    // 获取当前毫秒时间戳
+    static func currentMillisecondTimestamp() -> Int64 {
+        return Int64(Date().timeIntervalSince1970 * 1000)
+    }
+    
+    // 创建一个公共的DateFormatter供内部使用
+    private static func dateFormatter() -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:sss"
+        return formatter
+    }
 } 
